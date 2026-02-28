@@ -2,9 +2,7 @@
   <img src="scaf-logo.png" width="250px">
 </p>
 
-**template-starter** is a generic scaf base for creating new scaf templates.
-
-It intentionally excludes cloud, Kubernetes, and deployment-specific implementation so you can compose specialized templates on top.
+**template-starter** is a generic Scaf base for creating new Scaf templates.
 
 ## What This Base Template Focuses On
 

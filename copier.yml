@@ -51,6 +51,11 @@ copier__email:
   default: "{{ copier__author_name.lower().replace(' ', '.') }}@example.com"
   help: "Author email."
 
+copier__repo_url:
+  type: str
+  default: ""
+  help: "Optional git remote URL for the generated project (e.g. git@github.com:org/repo.git)."
+
 copier__version:
   type: str
   default: "0.1.0"

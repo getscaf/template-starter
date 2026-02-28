@@ -1,6 +1,6 @@
 import os
 import pathlib
-import shutil
+import shlex
 import subprocess
 
 CI_PROVIDER = "{{ copier__ci_provider }}"
@@ -9,6 +9,10 @@ SECRET_SCANNING = {{ "True" if copier__enable_secret_scanning else "False" }}
 TASK_RUNNER = "{{ copier__task_runner }}"
 
 ROOT = pathlib.Path(".")
+TERMINATOR = "\x1b[0m"
+WARNING = "\x1b[1;33m [WARNING]: "
+INFO = "\x1b[1;33m [INFO]: "
+SUCCESS = "\x1b[1;32m [SUCCESS]: "
 
 
 def remove(path: str) -> None:
@@ -29,63 +33,40 @@ def run(cmd: list[str]) -> None:
     subprocess.run(cmd, check=True)
 
 
-def init_semantic_release_dependencies() -> None:
-    if not SEMANTIC_RELEASE:
-        return
+def run_init_script() -> None:
+    run(["bash", "./scripts/init-dev.sh"])
 
-    if shutil.which("docker"):
-        uid = os.getuid()
-        gid = os.getgid()
-        run(
-            [
-                "docker",
-                "run",
-                "--rm",
-                "--user",
-                f"{uid}:{gid}",
-                "-w",
-                "/app",
-                "-v",
-                f"{ROOT.resolve()}:/app",
-                "-e",
-                "npm_config_cache=/tmp/.npm",
-                "node:lts",
-                "/bin/bash",
-                "-c",
-                "xargs npm install < dependencies-init.txt",
-            ]
+
+def init_git_repo() -> None:
+    if (ROOT / ".git").exists():
+        return
+    print(INFO + "Initializing git repository..." + TERMINATOR)
+    print(INFO + f"Current working directory: {os.getcwd()}" + TERMINATOR)
+    subprocess.run(
+        shlex.split("git -c init.defaultBranch=main init . --quiet"), check=True
+    )
+    print(SUCCESS + "Git repository initialized." + TERMINATOR)
+
+
+def configure_git_remote() -> None:
+    repo_url = "{{ copier__repo_url }}"
+    if repo_url:
+        print(INFO + f"repo_url: {repo_url}" + TERMINATOR)
+        command = f"git remote add origin {repo_url}"
+        subprocess.run(shlex.split(command), check=True)
+        print(SUCCESS + f"Remote origin={repo_url} added." + TERMINATOR)
+    else:
+        print(
+            WARNING
+            + "No repo_url provided. Skipping git remote configuration."
+            + TERMINATOR
         )
-        run(
-            [
-                "docker",
-                "run",
-                "--rm",
-                "--user",
-                f"{uid}:{gid}",
-                "-w",
-                "/app",
-                "-v",
-                f"{ROOT.resolve()}:/app",
-                "-e",
-                "npm_config_cache=/tmp/.npm",
-                "node:lts",
-                "/bin/bash",
-                "-c",
-                "xargs npm install --save-dev < dependencies-dev-init.txt",
-            ]
-        )
-        return
-
-    if shutil.which("npm"):
-        run(["bash", "-lc", "xargs npm install < dependencies-init.txt"])
-        run(["bash", "-lc", "xargs npm install --save-dev < dependencies-dev-init.txt"])
-        return
-
-    print("Warning: semantic-release dependencies were not installed (docker and npm not found).")
 
 
 def main() -> None:
-    init_semantic_release_dependencies()
+    init_git_repo()
+    configure_git_remote()
+    run_init_script()
 
     if TASK_RUNNER != "make":
         remove("Makefile")
