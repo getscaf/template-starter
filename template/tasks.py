@@ -52,6 +52,19 @@ def configure_git_remote() -> None:
     repo_url = "{{ copier__repo_url }}"
     if repo_url:
         print(INFO + f"repo_url: {repo_url}" + TERMINATOR)
+        existing_origin = subprocess.run(
+            shlex.split("git remote get-url origin"),
+            capture_output=True,
+            text=True,
+        )
+        if existing_origin.returncode == 0:
+            current_origin = existing_origin.stdout.strip()
+            print(
+                INFO
+                + f"Remote origin already configured ({current_origin}). Skipping add."
+                + TERMINATOR
+            )
+            return
         command = f"git remote add origin {repo_url}"
         subprocess.run(shlex.split(command), check=True)
         print(SUCCESS + f"Remote origin={repo_url} added." + TERMINATOR)
