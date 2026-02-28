@@ -1,0 +1,5 @@
+{
+  "name": "{{ copier__project_dash }}",
+  "version": "{{ copier__version }}",
+  "private": true
+}

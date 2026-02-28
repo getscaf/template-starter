@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  init:
+    desc: Initialize local development dependencies
+    cmds:
+      - ./scripts/init-dev.sh
+
+  check:
+    desc: Run local quality checks
+    cmds:
+      - |
+        if command -v pre-commit >/dev/null 2>&1; then
+          pre-commit run --all-files
+        else
+          echo "pre-commit not installed; skipping"
+        fi

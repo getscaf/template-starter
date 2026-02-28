@@ -1,0 +1,10 @@
+SHELL := /bin/bash
+
+.PHONY: init check
+
+init:
+	./scripts/init-dev.sh
+
+check:
+	@if command -v pre-commit >/dev/null 2>&1; then pre-commit run --all-files; else echo "pre-commit not installed; skipping"; fi
+
