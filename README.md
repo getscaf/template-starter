@@ -2,7 +2,7 @@
   <img src="scaf-logo.png" width="250px">
 </p>
 
-**template-template** is a generic scaf base for creating new scaf templates.
+**template-starter** is a generic scaf base for creating new scaf templates.
 
 It intentionally excludes cloud, Kubernetes, and deployment-specific implementation so you can compose specialized templates on top.
 
@@ -20,10 +20,10 @@ It intentionally excludes cloud, Kubernetes, and deployment-specific implementat
 
 ```bash
 # Local path
-scaf my-template ./template-template
+scaf my-template ./template-starter
 
 # Git URL
-scaf my-template https://github.com/getscaf/template-template.git
+scaf my-template https://github.com/getscaf/template-starter.git
 ```
 
 Then run local init in the generated project using the selected runner.
