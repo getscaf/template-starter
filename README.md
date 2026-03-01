@@ -29,7 +29,10 @@ GitHub App), optional gitleaks scanning, and generated `make`/`task`/`just`
 - `copier__github_semantic_release_auth`: `github_token` or `github_app` (GitHub + semantic-release only)
 - `copier__enable_secret_scanning`: include gitleaks CI
 - `copier__task_runner`: `make`, `task`, or `just`
-- `copier__repo_url`: optional remote URL to configure as `origin` during generation
+- `copier__configure_repo`: enable repository remote setup
+- `copier__repo_provider`: `github` or `gitlab`
+- `copier__repo_org`: organization/group name
+- `copier__repo_name`: repository name
 - `copier__create_repo`: create provider repo automatically when missing (`gh` for GitHub, `glab` for GitLab)
 - `copier__repo_visibility`: `private` or `public` for automatic repo creation
 

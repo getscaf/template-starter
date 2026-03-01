@@ -51,25 +51,51 @@ copier__email:
   default: "{{ copier__author_name.lower().replace(' ', '.') }}@example.com"
   help: "Author email."
 
+copier__configure_repo:
+  type: bool
+  default: true
+  help: "Configure a git remote for the generated project."
+
+copier__repo_provider:
+  type: str
+  default: github
+  choices:
+    - github
+    - gitlab
+  help: "Repository provider."
+  when: "{{ copier__configure_repo }}"
+
+copier__repo_org:
+  type: str
+  default: "getscaf"
+  help: "Repository organization/group."
+  when: "{{ copier__configure_repo }}"
+
+copier__repo_name:
+  type: str
+  default: "{{ copier__project_dash }}"
+  help: "Repository name."
+  when: "{{ copier__configure_repo }}"
+
 copier__repo_url:
   type: str
-  default: ""
-  help: "Optional git remote URL for the generated project (e.g. git@github.com:org/repo.git)."
+  default: "{{ ('git@github.com:' + copier__repo_org + '/' + copier__repo_name + '.git') if (copier__configure_repo and copier__repo_provider == 'github') else (('git@gitlab.com:' + copier__repo_org + '/' + copier__repo_name + '.git') if copier__configure_repo else '') }}"
+  when: false
 
 copier__create_repo:
   type: bool
   default: true
-  help: "Create the selected provider repository automatically if it does not exist (gh for GitHub, glab for GitLab)."
-  when: "{{ copier__repo_url | trim != '' }}"
+  help: "Create the repository automatically if it does not exist (gh for GitHub, glab for GitLab)."
+  when: "{{ copier__configure_repo }}"
 
 copier__repo_visibility:
   type: str
-  default: private
+  default: public
   choices:
     - private
     - public
   help: "Visibility to use when creating the repository."
-  when: "{{ copier__create_repo }}"
+  when: "{{ copier__configure_repo and copier__create_repo }}"
 
 copier__version:
   type: str
