@@ -101,7 +101,6 @@ def maybe_create_repo() -> None:
 
     repo_url = "{{ copier__repo_url }}".strip()
     if not repo_url:
-        print(WARNING + "Repo creation requested but no repo_url was provided." + TERMINATOR)
         return
 
     parsed = parse_repo_url(repo_url)
@@ -119,10 +118,17 @@ def maybe_create_repo() -> None:
             print(WARNING + "gh CLI is not installed. Skipping repo creation." + TERMINATOR)
             return
 
+        gh_env = os.environ.copy()
+        repo_ref = repo_name
+        if host != "github.com":
+            gh_env["GH_HOST"] = host
+            repo_ref = f"{host}/{repo_name}"
+
         repo_exists = subprocess.run(
-            ["gh", "repo", "view", repo_name, "--hostname", host],
+            ["gh", "repo", "view", repo_ref],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            env=gh_env,
         )
         if repo_exists.returncode == 0:
             print(INFO + f"GitHub repository {repo_name} already exists." + TERMINATOR)
@@ -134,9 +140,10 @@ def maybe_create_repo() -> None:
             + TERMINATOR
         )
         create_repo = subprocess.run(
-            ["gh", "repo", "create", repo_name, f"--{REPO_VISIBILITY}", "--hostname", host],
+            ["gh", "repo", "create", repo_name, f"--{REPO_VISIBILITY}"],
             capture_output=True,
             text=True,
+            env=gh_env,
         )
         if create_repo.returncode != 0:
             error = create_repo.stderr.strip() or create_repo.stdout.strip() or "unknown error"
