@@ -1,6 +1,5 @@
 import os
 import pathlib
-import re
 import shlex
 import shutil
 import subprocess
@@ -9,6 +8,11 @@ CI_PROVIDER = "{{ copier__ci_provider }}"
 SEMANTIC_RELEASE = {{ "True" if copier__enable_semantic_release else "False" }}
 SECRET_SCANNING = {{ "True" if copier__enable_secret_scanning else "False" }}
 TASK_RUNNER = "{{ copier__task_runner }}"
+CONFIGURE_REPO = {{ "True" if copier__configure_repo else "False" }}
+REPO_PROVIDER = "{{ copier__repo_provider }}"
+REPO_ORG = "{{ copier__repo_org }}"
+REPO_NAME = "{{ copier__repo_name }}"
+REPO_URL = "{{ copier__repo_url }}"
 CREATE_REPO = {{ "True" if copier__create_repo else "False" }}
 REPO_VISIBILITY = "{{ copier__repo_visibility }}"
 
@@ -53,7 +57,9 @@ def init_git_repo() -> None:
 
 
 def configure_git_remote() -> None:
-    repo_url = "{{ copier__repo_url }}"
+    if not CONFIGURE_REPO:
+        return
+    repo_url = REPO_URL.strip()
     if repo_url:
         print(INFO + f"repo_url: {repo_url}" + TERMINATOR)
         existing_origin = subprocess.run(
@@ -80,49 +86,30 @@ def configure_git_remote() -> None:
         )
 
 
-def parse_repo_url(repo_url: str) -> tuple[str, str] | None:
-    patterns = [
-        r"^git@(?P<host>[^:]+):(?P<path>[^ ]+?)(?:\.git)?$",
-        r"^https?://(?P<host>[^/]+)/(?P<path>[^ ]+?)(?:\.git)?/?$",
-    ]
-    for pattern in patterns:
-        match = re.match(pattern, repo_url)
-        if match:
-            host = match.group("host")
-            path = match.group("path").strip("/")
-            if path.count("/") >= 1:
-                return (host, path)
-    return None
-
-
 def maybe_create_repo() -> None:
     if not CREATE_REPO:
         return
 
-    repo_url = "{{ copier__repo_url }}".strip()
-    if not repo_url:
-        print(WARNING + "Repo creation requested but no repo_url was provided." + TERMINATOR)
+    if not CONFIGURE_REPO:
         return
-
-    parsed = parse_repo_url(repo_url)
-    if not parsed:
-        print(
-            WARNING
-            + f"Repo URL is not in a supported SSH/HTTPS format ({repo_url}). Skipping repo creation."
-            + TERMINATOR
-        )
+    if not REPO_ORG.strip() or not REPO_NAME.strip():
+        print(WARNING + "Repo org/name not set. Skipping repo creation." + TERMINATOR)
         return
-    host, repo_name = parsed
+    repo_name = f"{REPO_ORG.strip()}/{REPO_NAME.strip()}"
 
-    if CI_PROVIDER == "github":
+    if REPO_PROVIDER == "github":
         if not shutil.which("gh"):
             print(WARNING + "gh CLI is not installed. Skipping repo creation." + TERMINATOR)
             return
 
+        gh_env = os.environ.copy()
+        gh_env["GH_HOST"] = "github.com"
+
         repo_exists = subprocess.run(
-            ["gh", "repo", "view", repo_name, "--hostname", host],
+            ["gh", "repo", "view", repo_name],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            env=gh_env,
         )
         if repo_exists.returncode == 0:
             print(INFO + f"GitHub repository {repo_name} already exists." + TERMINATOR)
@@ -134,9 +121,10 @@ def maybe_create_repo() -> None:
             + TERMINATOR
         )
         create_repo = subprocess.run(
-            ["gh", "repo", "create", repo_name, f"--{REPO_VISIBILITY}", "--hostname", host],
+            ["gh", "repo", "create", repo_name, f"--{REPO_VISIBILITY}"],
             capture_output=True,
             text=True,
+            env=gh_env,
         )
         if create_repo.returncode != 0:
             error = create_repo.stderr.strip() or create_repo.stdout.strip() or "unknown error"
@@ -149,13 +137,13 @@ def maybe_create_repo() -> None:
         print(SUCCESS + f"GitHub repository {repo_name} created." + TERMINATOR)
         return
 
-    if CI_PROVIDER == "gitlab":
+    if REPO_PROVIDER == "gitlab":
         if not shutil.which("glab"):
             print(WARNING + "glab CLI is not installed. Skipping repo creation." + TERMINATOR)
             return
 
         glab_env = os.environ.copy()
-        glab_env["GITLAB_HOST"] = host
+        glab_env["GITLAB_HOST"] = "gitlab.com"
         repo_exists = subprocess.run(
             ["glab", "repo", "view", repo_name],
             stdout=subprocess.DEVNULL,
@@ -190,7 +178,7 @@ def maybe_create_repo() -> None:
 
     print(
         WARNING
-        + f"Repo creation not implemented for provider '{CI_PROVIDER}'. Skipping."
+        + f"Repo creation not implemented for provider '{REPO_PROVIDER}'. Skipping."
         + TERMINATOR
     )
 
