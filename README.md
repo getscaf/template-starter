@@ -30,6 +30,8 @@ GitHub App), optional gitleaks scanning, and generated `make`/`task`/`just`
 - `copier__enable_secret_scanning`: include gitleaks CI
 - `copier__task_runner`: `make`, `task`, or `just`
 - `copier__repo_url`: optional remote URL to configure as `origin` during generation
+- `copier__create_repo`: create provider repo automatically when missing (`gh` for GitHub, `glab` for GitLab)
+- `copier__repo_visibility`: `private` or `public` for automatic repo creation
 
 ## Quick Start
 
