@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1](https://github.com/getscaf/template-starter/compare/v1.1.0...v1.1.1) (2026-03-01)
+
+### Bug Fixes
+
+* **template:** correct gh repo creation flags and provider handling ([#3](https://github.com/getscaf/template-starter/issues/3)) ([b9ca1a9](https://github.com/getscaf/template-starter/commit/b9ca1a9d821ae144f30ed7ae773b55c010561700))
+
 ## [1.1.0](https://github.com/getscaf/template-starter/compare/v1.0.0...v1.1.0) (2026-03-01)
 
 ### Features
