@@ -56,6 +56,21 @@ copier__repo_url:
   default: ""
   help: "Optional git remote URL for the generated project (e.g. git@github.com:org/repo.git)."
 
+copier__create_repo:
+  type: bool
+  default: true
+  help: "Create the selected provider repository automatically if it does not exist (gh for GitHub, glab for GitLab)."
+  when: "{{ copier__repo_url | trim != '' }}"
+
+copier__repo_visibility:
+  type: str
+  default: private
+  choices:
+    - private
+    - public
+  help: "Visibility to use when creating the repository."
+  when: "{{ copier__create_repo }}"
+
 copier__version:
   type: str
   default: "0.1.0"
