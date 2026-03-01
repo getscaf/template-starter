@@ -6,9 +6,10 @@
 
 ## What This Starter Provides
 
-This starter provides a clean, reusable foundation for building new Scaf templates.
-It standardizes template authoring concerns such as Copier inputs, CI scaffolding,
-release automation options, secret scanning, and local developer workflows.
+Use this starter to generate new Scaf templates with validated Copier prompts,
+GitHub/GitLab CI templates, optional semantic-release wiring (GitHub token or
+GitHub App), optional gitleaks scanning, and generated `make`/`task`/`just`
+`init`/`check` commands.
 
 ## Features
 
