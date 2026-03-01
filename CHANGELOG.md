@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.0](https://github.com/getscaf/template-starter/compare/v1.0.0...v1.1.0) (2026-03-01)
+
+### Features
+
+* **template:** add provider-aware repo auto-creation ([#2](https://github.com/getscaf/template-starter/issues/2)) ([8a9d372](https://github.com/getscaf/template-starter/commit/8a9d3725ed43ec9cb091d367cb36d0496bd8abc1))
+
+### Documentation
+
+* **readme:** update intro paragraph ([#1](https://github.com/getscaf/template-starter/issues/1)) ([7384d67](https://github.com/getscaf/template-starter/commit/7384d67573ff303d1d9dc47ef6f2bb9f39bd4d37))
+
 ## 1.0.0 (2026-03-01)
 
 ### Features
