@@ -24,7 +24,7 @@ GitHub App), optional gitleaks scanning, and generated `make`/`task`/`just`
 
 ## Copier Options
 
-- `copier__ci_provider`: `github` or `gitlab`
+- `copier__ci_provider`: `github` or `gitlab` (only asked when repo setup is disabled; otherwise inferred from `copier__repo_provider`)
 - `copier__enable_semantic_release`: include release automation
 - `copier__github_semantic_release_auth`: `github_token` or `github_app` (GitHub + semantic-release only)
 - `copier__enable_secret_scanning`: include gitleaks CI

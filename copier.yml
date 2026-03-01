@@ -104,11 +104,12 @@ copier__version:
 
 copier__ci_provider:
   type: str
-  default: github
+  default: "{{ copier__repo_provider if copier__configure_repo else 'github' }}"
   help: "CI provider to scaffold."
   choices:
     - github
     - gitlab
+  when: "{{ not copier__configure_repo }}"
 
 copier__enable_semantic_release:
   type: bool
