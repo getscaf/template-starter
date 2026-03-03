@@ -4,7 +4,7 @@ SHELL := bash
 
 test-template-render: test-template-render-github test-template-render-gitlab
 
-# Validate GitHub-scaffolded output and task-runner pruning.
+# Validate generated template repository structure.
 test-template-render-github:
 	@set -euo pipefail; \
 	out_dir="$$(mktemp -d /tmp/scaf-template-github-XXXXXX)"; \
@@ -20,18 +20,33 @@ test-template-render-github:
 	  -d copier__github_semantic_release_auth="github_token" \
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="task"; \
-	test -f "$$out_dir/README.md"; \
+	test -f "$$out_dir/copier.yml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
-	test -f "$$out_dir/Taskfile.yml"; \
-	test ! -f "$$out_dir/Makefile"; \
-	test ! -f "$$out_dir/justfile"; \
-	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
-	test -f "$$out_dir/.github/workflows/secret-scan.yaml"; \
-	test ! -f "$$out_dir/.github/workflows/semantic-release.yaml"; \
-	test ! -f "$$out_dir/.gitlab-ci.yml"; \
+	test -f "$$out_dir/template/README.md"; \
+	test -f "$$out_dir/template/tasks.py"; \
+	test -f "$$out_dir/template/Makefile"; \
+	test -f "$$out_dir/template/Taskfile.yml"; \
+	test -f "$$out_dir/template/justfile"; \
+	test -f "$$out_dir/template/.github/workflows/template-correctness.yaml"; \
+	test -f "$$out_dir/template/.github/workflows/secret-scan.yaml"; \
+	test -f "$$out_dir/template/.github/workflows/semantic-release.yaml"; \
+	test -f "$$out_dir/template/.gitlab-ci.yml"; \
+	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
+	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
+	rg -q '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
+	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gh-XXXXXX)"; \
+	copier copy "$$out_dir" "$$render_dir" --trust --defaults \
+	  -d copier__configure_repo=false \
+	  -d copier__enable_semantic_release=false \
+	  -d copier__enable_secret_scanning=false \
+	  -d copier__ci_provider="github" \
+	  -d copier__task_runner="task"; \
+	test -f "$$render_dir/.copier-answers.yml"; \
+	test ! -f "$$render_dir/{{_copier_conf.answers_file}}"; \
+	rm -rf "$$render_dir"; \
 	rm -rf "$$out_dir"
 
-# Validate GitLab-scaffolded output and task-runner pruning.
+# Validate generated template repository structure.
 test-template-render-gitlab:
 	@set -euo pipefail; \
 	out_dir="$$(mktemp -d /tmp/scaf-template-gitlab-XXXXXX)"; \
@@ -46,11 +61,26 @@ test-template-render-gitlab:
 	  -d copier__enable_semantic_release=false \
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="just"; \
-	test -f "$$out_dir/README.md"; \
+	test -f "$$out_dir/copier.yml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
-	test -f "$$out_dir/justfile"; \
-	test ! -f "$$out_dir/Makefile"; \
-	test ! -f "$$out_dir/Taskfile.yml"; \
-	test -f "$$out_dir/.gitlab-ci.yml"; \
-	test ! -d "$$out_dir/.github"; \
+	test -f "$$out_dir/template/README.md"; \
+	test -f "$$out_dir/template/tasks.py"; \
+	test -f "$$out_dir/template/Makefile"; \
+	test -f "$$out_dir/template/Taskfile.yml"; \
+	test -f "$$out_dir/template/justfile"; \
+	test -f "$$out_dir/template/.gitlab-ci.yml"; \
+	test -d "$$out_dir/template/.github"; \
+	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
+	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
+	rg -q '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
+	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gl-XXXXXX)"; \
+	copier copy "$$out_dir" "$$render_dir" --trust --defaults \
+	  -d copier__configure_repo=false \
+	  -d copier__enable_semantic_release=false \
+	  -d copier__enable_secret_scanning=false \
+	  -d copier__ci_provider="gitlab" \
+	  -d copier__task_runner="just"; \
+	test -f "$$render_dir/.copier-answers.yml"; \
+	test ! -f "$$render_dir/{{_copier_conf.answers_file}}"; \
+	rm -rf "$$render_dir"; \
 	rm -rf "$$out_dir"

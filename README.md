@@ -9,7 +9,7 @@
 Use this starter to generate new Scaf templates with validated Copier prompts,
 GitHub/GitLab CI templates, optional semantic-release wiring (GitHub token or
 GitHub App), optional gitleaks scanning, and generated `make`/`task`/`just`
-`init`/`check` commands.
+`init`/`check` commands in the emitted `template/` payload.
 
 ## Features
 
@@ -18,6 +18,7 @@ GitHub App), optional gitleaks scanning, and generated `make`/`task`/`just`
 - Optional semantic-release setup and config
 - Optional secret scanning in CI
 - Template correctness CI (Copier render checks)
+- Generated templates are emitted under `template/` in the produced repository
 - Choice of local task runner (`make`, `task`, or `just`) with `init`/`check`
 - Generated project docs for usage and upgrade flow
 - Apache-2.0 license by default (license selection via Copier option planned)
@@ -60,9 +61,9 @@ CI runs the same command in `.github/workflows/template-render-tests.yaml`.
 
 Each generated project includes:
 
-- `docs/using-template.md`
-- `docs/upgrading.md`
-- `docs/semantic-release-github.md` (when GitHub + semantic-release is enabled)
+- `template/docs/using-template.md`
+- `template/docs/upgrading.md`
+- `template/docs/semantic-release-github.md` (when GitHub + semantic-release is enabled)
 
 These cover day-to-day usage and copier update workflow for downstream projects.
 

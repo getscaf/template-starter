@@ -1,5 +1,8 @@
-_templates_suffix: ".jinja"
+_templates_suffix: ""
 _subdirectory: template
+
+_tasks:
+  - python tasks.py
 
 copier__project_name_raw:
   type: str
