@@ -1,0 +1,45 @@
+name: Template Correctness
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  render-template:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install copier
+        run: pip install copier
+
+      - name: Render sample project
+        run: |
+          copier copy . /tmp/sample-project --trust --defaults \
+            -d copier__project_name_raw="Sample Project" \
+            -d copier__project_slug="sample_project" \
+            -d copier__description="Sample generated project" \
+            -d copier__author_name="Sample Author" \
+            -d copier__email="sample@example.com" \
+            -d copier__version="0.1.0" \
+            -d copier__configure_repo=false \
+            -d copier__ci_provider="github" \
+            -d copier__enable_semantic_release=false \
+            -d copier__enable_secret_scanning=false \
+            -d copier__task_runner="task"
+
+      - name: Validate generated project files
+        run: |
+          test -f /tmp/sample-project/README.md
+          test -f /tmp/sample-project/.copier-answers.yml
+          test -f /tmp/sample-project/Taskfile.yml
+          test ! -f /tmp/sample-project/Makefile
+          test ! -f /tmp/sample-project/justfile

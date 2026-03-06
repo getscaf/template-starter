@@ -21,6 +21,8 @@ test-template-render-github:
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="task"; \
 	test -f "$$out_dir/copier.yml"; \
+	test -f "$$out_dir/README.md"; \
+	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/template/README.md"; \
 	test -f "$$out_dir/template/tasks.py"; \
@@ -33,6 +35,7 @@ test-template-render-github:
 	test -f "$$out_dir/template/.gitlab-ci.yml"; \
 	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
 	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
+	rg -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
 	rg -q '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
 	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gh-XXXXXX)"; \
 	copier copy "$$out_dir" "$$render_dir" --trust --defaults \
@@ -62,6 +65,8 @@ test-template-render-gitlab:
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="just"; \
 	test -f "$$out_dir/copier.yml"; \
+	test -f "$$out_dir/README.md"; \
+	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/template/README.md"; \
 	test -f "$$out_dir/template/tasks.py"; \
@@ -72,6 +77,7 @@ test-template-render-gitlab:
 	test -d "$$out_dir/template/.github"; \
 	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
 	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
+	rg -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
 	rg -q '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
 	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gl-XXXXXX)"; \
 	copier copy "$$out_dir" "$$render_dir" --trust --defaults \

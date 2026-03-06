@@ -1,0 +1,27 @@
+# {{ copier__project_name }}
+
+{{ copier__description }}
+
+This repository is a Copier template. It renders project scaffolding from the `template/` directory.
+
+## Use This Template
+
+```bash
+# From a local clone
+copier copy . /path/to/new-project --trust
+
+# Or from a remote repository URL
+copier copy <template-repo-url> /path/to/new-project --trust
+```
+
+## What Gets Rendered
+
+- Project metadata and docs
+- CI scaffolding
+- Optional semantic-release wiring
+- Optional secret scanning
+- Task runner files (`make`, `task`, or `just`, pruned by selected option)
+
+## Template Validation
+
+This repository includes `.github/workflows/template-correctness.yaml`, which renders a sample project on every push/PR to verify the template remains valid.

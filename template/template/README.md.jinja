@@ -1,4 +1,4 @@
-# {{ copier__project_name }}
+{% raw %}# {{ copier__project_name }}
 
 {{ copier__description }}
 
@@ -43,3 +43,4 @@ task check
 - [Upgrading Projects](docs/upgrading.md)
 {% if copier__ci_provider == "github" and copier__enable_semantic_release %}- [GitHub Semantic Release Setup](docs/semantic-release-github.md)
 {% endif %}
+{% endraw %}
