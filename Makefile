@@ -26,13 +26,17 @@ test-template-render-github:
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/template/README.md"; \
 	test -f "$$out_dir/template/tasks.py"; \
-	test -f "$$out_dir/template/Makefile"; \
 	test -f "$$out_dir/template/Taskfile.yml"; \
-	test -f "$$out_dir/template/justfile"; \
+	test ! -f "$$out_dir/template/Makefile"; \
+	test ! -f "$$out_dir/template/justfile"; \
 	test -f "$$out_dir/template/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/template/.github/workflows/secret-scan.yaml"; \
-	test -f "$$out_dir/template/.github/workflows/semantic-release.yaml"; \
-	test -f "$$out_dir/template/.gitlab-ci.yml"; \
+	test ! -f "$$out_dir/template/.github/workflows/semantic-release.yaml"; \
+	test ! -f "$$out_dir/template/.github/workflows/semantic-pull-request.yaml"; \
+	test ! -f "$$out_dir/template/.gitlab-ci.yml"; \
+	test ! -f "$$out_dir/template/package.json"; \
+	test ! -f "$$out_dir/template/dependencies-init.txt"; \
+	test ! -f "$$out_dir/template/dependencies-dev-init.txt"; \
 	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
 	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
 	rg -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
@@ -70,11 +74,14 @@ test-template-render-gitlab:
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/template/README.md"; \
 	test -f "$$out_dir/template/tasks.py"; \
-	test -f "$$out_dir/template/Makefile"; \
-	test -f "$$out_dir/template/Taskfile.yml"; \
 	test -f "$$out_dir/template/justfile"; \
+	test ! -f "$$out_dir/template/Makefile"; \
+	test ! -f "$$out_dir/template/Taskfile.yml"; \
 	test -f "$$out_dir/template/.gitlab-ci.yml"; \
-	test -d "$$out_dir/template/.github"; \
+	test ! -d "$$out_dir/template/.github"; \
+	test ! -f "$$out_dir/template/package.json"; \
+	test ! -f "$$out_dir/template/dependencies-init.txt"; \
+	test ! -f "$$out_dir/template/dependencies-dev-init.txt"; \
 	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
 	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
 	rg -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
