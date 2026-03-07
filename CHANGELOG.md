@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2](https://github.com/getscaf/template-starter/compare/v1.1.1...v1.1.2) (2026-03-07)
+
+### Bug Fixes
+
+* template nesting ([#4](https://github.com/getscaf/template-starter/issues/4)) ([28920e4](https://github.com/getscaf/template-starter/commit/28920e479b77931655e66750b7122d8b72ea50fa))
+
 ## [1.1.1](https://github.com/getscaf/template-starter/compare/v1.1.0...v1.1.1) (2026-03-01)
 
 ### Bug Fixes
