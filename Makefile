@@ -8,7 +8,7 @@ test-template-render: test-template-render-github test-template-render-gitlab
 test-template-render-github:
 	@set -euo pipefail; \
 	out_dir="$$(mktemp -d /tmp/scaf-template-github-XXXXXX)"; \
-	copier copy . "$$out_dir" --trust --defaults \
+	copier copy . "$$out_dir" --vcs-ref=HEAD --trust --defaults \
 	  -d copier__project_name_raw="Sample GitHub Template" \
 	  -d copier__project_slug="sample_github_template" \
 	  -d copier__description="Sample github generated project" \
@@ -38,9 +38,9 @@ test-template-render-github:
 	test ! -f "$$out_dir/template/dependencies-init.txt"; \
 	test ! -f "$$out_dir/template/dependencies-dev-init.txt"; \
 	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
-	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
-	rg -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
-	rg -q '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
+	grep -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
+	grep -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
+	grep -Eq '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
 	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gh-XXXXXX)"; \
 	copier copy "$$out_dir" "$$render_dir" --trust --defaults \
 	  -d copier__configure_repo=false \
@@ -57,7 +57,7 @@ test-template-render-github:
 test-template-render-gitlab:
 	@set -euo pipefail; \
 	out_dir="$$(mktemp -d /tmp/scaf-template-gitlab-XXXXXX)"; \
-	copier copy . "$$out_dir" --trust --defaults \
+	copier copy . "$$out_dir" --vcs-ref=HEAD --trust --defaults \
 	  -d copier__project_name_raw="Sample GitLab Template" \
 	  -d copier__project_slug="sample_gitlab_template" \
 	  -d copier__description="Sample gitlab generated project" \
@@ -83,9 +83,9 @@ test-template-render-gitlab:
 	test ! -f "$$out_dir/template/dependencies-init.txt"; \
 	test ! -f "$$out_dir/template/dependencies-dev-init.txt"; \
 	test -f "$$out_dir/template/{{_copier_conf.answers_file}}"; \
-	rg -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
-	rg -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
-	rg -q '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
+	grep -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
+	grep -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
+	grep -Eq '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
 	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gl-XXXXXX)"; \
 	copier copy "$$out_dir" "$$render_dir" --trust --defaults \
 	  -d copier__configure_repo=false \
