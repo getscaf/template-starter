@@ -138,8 +138,3 @@ copier__task_runner:
     - make
     - task
     - just
-
-copier__template_sample_name:
-  type: str
-  default: "sample"
-  help: "Sample project name used by template correctness CI."
