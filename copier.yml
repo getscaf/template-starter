@@ -2,7 +2,7 @@ _templates_suffix: ".jinja"
 _subdirectory: template
 
 _tasks:
-  - python template/tasks.py
+  - SCAF_TEMPLATE_STARTER_STAGE=1 python template/tasks.py
 
 copier__project_name_raw:
   type: str
