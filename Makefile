@@ -25,7 +25,7 @@ test-template-render-github:
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/template/README.md"; \
-	test -f "$$out_dir/template/tasks.py"; \
+	test -f "$$out_dir/template/.scaf/post-copy.sh"; \
 	test -f "$$out_dir/template/Taskfile.yml"; \
 	test ! -f "$$out_dir/template/Makefile"; \
 	test ! -f "$$out_dir/template/justfile"; \
@@ -73,7 +73,7 @@ test-template-render-gitlab:
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/template/README.md"; \
-	test -f "$$out_dir/template/tasks.py"; \
+	test -f "$$out_dir/template/.scaf/post-copy.sh"; \
 	test -f "$$out_dir/template/justfile"; \
 	test ! -f "$$out_dir/template/Makefile"; \
 	test ! -f "$$out_dir/template/Taskfile.yml"; \

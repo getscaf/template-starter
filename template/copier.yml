@@ -2,7 +2,7 @@ _templates_suffix: ""
 _subdirectory: template
 
 _tasks:
-  - python tasks.py
+  - bash .scaf/post-copy.sh
 
 copier__project_name_raw:
   type: str

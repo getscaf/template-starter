@@ -6,15 +6,7 @@ if command -v pre-commit >/dev/null 2>&1 && git rev-parse --is-inside-work-tree 
 fi
 
 {% if copier__enable_semantic_release %}
-has_unrendered_jinja() {
-  grep -Eq '[{][{]|[{][%]' dependencies-init.txt dependencies-dev-init.txt
-}
-
-if [[ "${SCAF_SKIP_INIT_DEV_NPM:-0}" == "1" ]]; then
-  echo "Skipping semantic-release dependency install for starter-stage render"
-elif has_unrendered_jinja; then
-  echo "Skipping semantic-release dependency install for unresolved template files"
-elif command -v npm >/dev/null 2>&1; then
+if command -v npm >/dev/null 2>&1; then
   xargs npm install < dependencies-init.txt
   xargs npm install --save-dev < dependencies-dev-init.txt
 elif command -v docker >/dev/null 2>&1; then
