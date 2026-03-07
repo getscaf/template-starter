@@ -12,6 +12,9 @@ REPO_NAME="{{ copier__repo_name }}"
 REPO_URL="{{ copier__repo_url }}"
 CREATE_REPO="{{ 'true' if copier__create_repo else 'false' }}"
 REPO_VISIBILITY="{{ copier__repo_visibility }}"
+AUTHOR_NAME="{{ copier__author_name }}"
+AUTHOR_EMAIL="{{ copier__email }}"
+REPO_INITIALIZED="false"
 
 TERMINATOR="\033[0m"
 WARNING="\033[1;33m [WARNING]: "
@@ -99,7 +102,29 @@ init_git_repo() {
   log_info "Initializing git repository..."
   log_info "Current working directory: $(pwd)"
   git -c init.defaultBranch=main init . --quiet
+  REPO_INITIALIZED="true"
   log_success "Git repository initialized."
+}
+
+maybe_initial_commit() {
+  if ! is_true "$REPO_INITIALIZED"; then
+    return
+  fi
+
+  if git rev-parse --verify HEAD >/dev/null 2>&1; then
+    return
+  fi
+
+  git add -A
+  if [[ -z "$(git status --porcelain)" ]]; then
+    return
+  fi
+
+  if ! git -c "user.name=${AUTHOR_NAME}" -c "user.email=${AUTHOR_EMAIL}" commit --no-verify -m "chore: initialize from template" >/dev/null 2>&1; then
+    log_warning "Initial commit failed. Configure git user.name and user.email, then commit manually."
+    return
+  fi
+  log_success "Initial commit created."
 }
 
 configure_git_remote() {
@@ -206,6 +231,7 @@ main() {
 
   remove_path ".scaf/starter-post-copy.sh"
   rmdir ".scaf" 2>/dev/null || true
+  maybe_initial_commit
 }
 
 main "$@"
