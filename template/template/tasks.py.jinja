@@ -16,7 +16,8 @@ REPO_URL = "{{ copier__repo_url }}"
 CREATE_REPO = {{ "True" if copier__create_repo else "False" }}
 REPO_VISIBILITY = "{{ copier__repo_visibility }}"
 
-ROOT = pathlib.Path(".")
+PROJECT_ROOT = pathlib.Path.cwd()
+TEMPLATE_ROOT = pathlib.Path(__file__).resolve().parent
 TERMINATOR = "\x1b[0m"
 WARNING = "\x1b[1;33m [WARNING]: "
 INFO = "\x1b[1;33m [INFO]: "
@@ -24,7 +25,7 @@ SUCCESS = "\x1b[1;32m [SUCCESS]: "
 
 
 def remove(path: str) -> None:
-    p = ROOT / path
+    p = TEMPLATE_ROOT / path
     if p.exists():
         if p.is_file() or p.is_symlink():
             p.unlink()
@@ -37,21 +38,23 @@ def remove(path: str) -> None:
             p.rmdir()
 
 
-def run(cmd: list[str]) -> None:
-    subprocess.run(cmd, check=True)
+def run(cmd: list[str], *, cwd: pathlib.Path | None = None) -> None:
+    subprocess.run(cmd, check=True, cwd=cwd)
 
 
 def run_init_script() -> None:
-    run(["bash", "./scripts/init-dev.sh"])
+    run(["bash", "./scripts/init-dev.sh"], cwd=TEMPLATE_ROOT)
 
 
 def init_git_repo() -> None:
-    if (ROOT / ".git").exists():
+    if (PROJECT_ROOT / ".git").exists():
         return
     print(INFO + "Initializing git repository..." + TERMINATOR)
-    print(INFO + f"Current working directory: {os.getcwd()}" + TERMINATOR)
+    print(INFO + f"Current working directory: {PROJECT_ROOT}" + TERMINATOR)
     subprocess.run(
-        shlex.split("git -c init.defaultBranch=main init . --quiet"), check=True
+        shlex.split("git -c init.defaultBranch=main init . --quiet"),
+        check=True,
+        cwd=PROJECT_ROOT,
     )
     print(SUCCESS + "Git repository initialized." + TERMINATOR)
 
@@ -66,6 +69,7 @@ def configure_git_remote() -> None:
             shlex.split("git remote get-url origin"),
             capture_output=True,
             text=True,
+            cwd=PROJECT_ROOT,
         )
         if existing_origin.returncode == 0:
             current_origin = existing_origin.stdout.strip()
@@ -76,7 +80,7 @@ def configure_git_remote() -> None:
             )
             return
         command = f"git remote add origin {repo_url}"
-        subprocess.run(shlex.split(command), check=True)
+        subprocess.run(shlex.split(command), check=True, cwd=PROJECT_ROOT)
         print(SUCCESS + f"Remote origin={repo_url} added." + TERMINATOR)
     else:
         print(
