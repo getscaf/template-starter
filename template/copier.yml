@@ -1,8 +1,8 @@
-_templates_suffix: ".jinja"
+_templates_suffix: ""
 _subdirectory: template
 
 _tasks:
-  - python .scaf/starter-post-copy.py
+  - python .scaf/post-copy.py
 
 copier__project_name_raw:
   type: str
