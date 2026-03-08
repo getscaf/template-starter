@@ -25,10 +25,12 @@ test-template-render-github:
 	test ! -f "$$out_dir/Makefile"; \
 	test ! -f "$$out_dir/justfile"; \
 	test -f "$$out_dir/README.md"; \
+	test -f "$$out_dir/LICENSE"; \
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/scripts/test-template-render.sh"; \
 	test -f "$$out_dir/template/README.md"; \
+	test -f "$$out_dir/template/LICENSE"; \
 	test -f "$$out_dir/template/.scaf/post-copy.py"; \
 	test -f "$$out_dir/template/Taskfile.yml"; \
 	test ! -f "$$out_dir/template/Makefile"; \
@@ -54,6 +56,7 @@ test-template-render-github:
 	  -d copier__ci_provider="github" \
 	  -d copier__task_runner="task"; \
 	test -f "$$render_dir/.copier-answers.yml"; \
+	test -f "$$render_dir/LICENSE"; \
 	test ! -f "$$render_dir/{{_copier_conf.answers_file}}"; \
 	rm -rf "$$render_dir"; \
 	rm -rf "$$out_dir"
@@ -78,10 +81,12 @@ test-template-render-gitlab:
 	test ! -f "$$out_dir/Makefile"; \
 	test ! -f "$$out_dir/Taskfile.yml"; \
 	test -f "$$out_dir/README.md"; \
+	test -f "$$out_dir/LICENSE"; \
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/scripts/test-template-render.sh"; \
 	test -f "$$out_dir/template/README.md"; \
+	test -f "$$out_dir/template/LICENSE"; \
 	test -f "$$out_dir/template/.scaf/post-copy.py"; \
 	test -f "$$out_dir/template/justfile"; \
 	test ! -f "$$out_dir/template/Makefile"; \
@@ -104,6 +109,7 @@ test-template-render-gitlab:
 	  -d copier__ci_provider="gitlab" \
 	  -d copier__task_runner="just"; \
 	test -f "$$render_dir/.copier-answers.yml"; \
+	test -f "$$render_dir/LICENSE"; \
 	test ! -f "$$render_dir/{{_copier_conf.answers_file}}"; \
 	rm -rf "$$render_dir"; \
 	rm -rf "$$out_dir"
