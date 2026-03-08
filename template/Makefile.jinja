@@ -1,0 +1,79 @@
+SHELL := bash
+
+COPIER_CI_PROVIDER := {{ copier__ci_provider }}
+COPIER_TASK_RUNNER := {{ copier__task_runner }}
+COPIER_ENABLE_SEMANTIC_RELEASE := {{ 'true' if copier__enable_semantic_release else 'false' }}
+COPIER_ENABLE_SECRET_SCANNING := {{ 'true' if copier__enable_secret_scanning else 'false' }}
+COPIER_GITHUB_SEMANTIC_RELEASE_AUTH := {{ copier__github_semantic_release_auth if copier__ci_provider == 'github' and copier__enable_semantic_release else 'github_token' }}
+
+.PHONY: test-template-render
+
+test-template-render:
+	@set -euo pipefail; \
+	out_dir="$$(mktemp -d /tmp/scaf-template-render-XXXXXX)"; \
+	github_auth_arg=""; \
+	if [ "$(COPIER_CI_PROVIDER)" = "github" ] && [ "$(COPIER_ENABLE_SEMANTIC_RELEASE)" = "true" ]; then \
+	  github_auth_arg="-d copier__github_semantic_release_auth=$(COPIER_GITHUB_SEMANTIC_RELEASE_AUTH)"; \
+	fi; \
+	copier copy . "$$out_dir" --trust --defaults \
+	  -d copier__project_name_raw="Sample Project" \
+	  -d copier__project_slug="sample_project" \
+	  -d copier__description="Sample generated project" \
+	  -d copier__author_name="Sample Author" \
+	  -d copier__email="sample@example.com" \
+	  -d copier__version="0.1.0" \
+	  -d copier__configure_repo=false \
+	  -d copier__ci_provider="$(COPIER_CI_PROVIDER)" \
+	  -d copier__enable_semantic_release=$(COPIER_ENABLE_SEMANTIC_RELEASE) \
+	  $$github_auth_arg \
+	  -d copier__enable_secret_scanning=$(COPIER_ENABLE_SECRET_SCANNING) \
+	  -d copier__task_runner="$(COPIER_TASK_RUNNER)"; \
+	test -f "$$out_dir/README.md"; \
+	test -f "$$out_dir/.copier-answers.yml"; \
+	test ! -f "$$out_dir/{% raw %}{{_copier_conf.answers_file}}{% endraw %}"; \
+	if [ "$(COPIER_TASK_RUNNER)" = "make" ]; then \
+	  test -f "$$out_dir/Makefile"; \
+	  test ! -f "$$out_dir/Taskfile.yml"; \
+	  test ! -f "$$out_dir/justfile"; \
+	elif [ "$(COPIER_TASK_RUNNER)" = "task" ]; then \
+	  test -f "$$out_dir/Taskfile.yml"; \
+	  test ! -f "$$out_dir/Makefile"; \
+	  test ! -f "$$out_dir/justfile"; \
+	else \
+	  test -f "$$out_dir/justfile"; \
+	  test ! -f "$$out_dir/Makefile"; \
+	  test ! -f "$$out_dir/Taskfile.yml"; \
+	fi; \
+	if [ "$(COPIER_CI_PROVIDER)" = "github" ]; then \
+	  test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
+	  test ! -f "$$out_dir/.gitlab-ci.yml"; \
+	else \
+	  test -f "$$out_dir/.gitlab-ci.yml"; \
+	  test ! -d "$$out_dir/.github"; \
+	fi; \
+	if [ "$(COPIER_ENABLE_SEMANTIC_RELEASE)" = "true" ]; then \
+	  test -f "$$out_dir/package.json"; \
+	  test -f "$$out_dir/dependencies-init.txt"; \
+	  test -f "$$out_dir/dependencies-dev-init.txt"; \
+	  test -f "$$out_dir/.releaserc.json"; \
+	  test -f "$$out_dir/CHANGELOG.md"; \
+	else \
+	  test ! -f "$$out_dir/package.json"; \
+	  test ! -f "$$out_dir/dependencies-init.txt"; \
+	  test ! -f "$$out_dir/dependencies-dev-init.txt"; \
+	  test ! -f "$$out_dir/.releaserc.json"; \
+	  test ! -f "$$out_dir/CHANGELOG.md"; \
+	fi; \
+	if [ "$(COPIER_CI_PROVIDER)" = "github" ] && [ "$(COPIER_ENABLE_SEMANTIC_RELEASE)" = "true" ]; then \
+	  test -f "$$out_dir/.github/workflows/semantic-release.yaml"; \
+	  test -f "$$out_dir/.github/workflows/semantic-pull-request.yaml"; \
+	else \
+	  test ! -f "$$out_dir/.github/workflows/semantic-release.yaml"; \
+	  test ! -f "$$out_dir/.github/workflows/semantic-pull-request.yaml"; \
+	fi; \
+	if [ "$(COPIER_CI_PROVIDER)" = "github" ] && [ "$(COPIER_ENABLE_SECRET_SCANNING)" = "true" ]; then \
+	  test -f "$$out_dir/.github/workflows/secret-scan.yaml"; \
+	else \
+	  test ! -f "$$out_dir/.github/workflows/secret-scan.yaml"; \
+	fi; \
+	rm -rf "$$out_dir"
