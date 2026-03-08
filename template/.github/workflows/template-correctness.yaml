@@ -22,4 +22,4 @@ jobs:
         run: pip install copier
 
       - name: Run render tests
-        run: make test-template-render
+        run: bash ./scripts/test-template-render.sh

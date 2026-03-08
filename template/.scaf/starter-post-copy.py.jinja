@@ -238,7 +238,29 @@ def run_template_init() -> None:
     print("Local development setup complete.")
 
 
+def render_root_task_runner() -> None:
+    runner_templates = PROJECT_ROOT / ".scaf" / "task-runners"
+    by_runner = {
+        "make": "Makefile",
+        "task": "Taskfile.yml",
+        "just": "justfile",
+    }
+    selected = by_runner.get(TASK_RUNNER)
+
+    for runner_file in by_runner.values():
+        target = PROJECT_ROOT / runner_file
+        source = runner_templates / runner_file
+        if runner_file == selected and source.exists():
+            shutil.copyfile(source, target)
+        else:
+            remove(target)
+
+    remove(runner_templates)
+
+
 def prune_starter_template() -> None:
+    render_root_task_runner()
+
     if TASK_RUNNER != "make":
         remove(TEMPLATE_ROOT / "Makefile")
     if TASK_RUNNER != "task":

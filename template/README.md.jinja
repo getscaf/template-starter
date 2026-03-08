@@ -27,7 +27,13 @@ copier copy <template-repo-url> /path/to/new-project --trust
 Run local render checks with:
 
 ```bash
+{% if copier__task_runner == "make" %}
 make test-template-render
+{% elif copier__task_runner == "just" %}
+just test-template-render
+{% else %}
+task test-template-render
+{% endif %}
 ```
 
 This repository also includes `.github/workflows/template-correctness.yaml`, which runs the same check on every push/PR (for GitHub CI).

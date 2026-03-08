@@ -21,10 +21,13 @@ test-template-render-github:
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="task"; \
 	test -f "$$out_dir/copier.yml"; \
-	test -f "$$out_dir/Makefile"; \
+	test -f "$$out_dir/Taskfile.yml"; \
+	test ! -f "$$out_dir/Makefile"; \
+	test ! -f "$$out_dir/justfile"; \
 	test -f "$$out_dir/README.md"; \
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
+	test -f "$$out_dir/scripts/test-template-render.sh"; \
 	test -f "$$out_dir/template/README.md"; \
 	test -f "$$out_dir/template/.scaf/post-copy.py"; \
 	test -f "$$out_dir/template/Taskfile.yml"; \
@@ -42,7 +45,7 @@ test-template-render-github:
 	grep -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
 	grep -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
 	grep -Eq '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
-	$(MAKE) -C "$$out_dir" test-template-render; \
+	(cd "$$out_dir" && bash ./scripts/test-template-render.sh); \
 	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gh-XXXXXX)"; \
 	copier copy "$$out_dir" "$$render_dir" --trust --defaults \
 	  -d copier__configure_repo=false \
@@ -71,10 +74,13 @@ test-template-render-gitlab:
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="just"; \
 	test -f "$$out_dir/copier.yml"; \
-	test -f "$$out_dir/Makefile"; \
+	test -f "$$out_dir/justfile"; \
+	test ! -f "$$out_dir/Makefile"; \
+	test ! -f "$$out_dir/Taskfile.yml"; \
 	test -f "$$out_dir/README.md"; \
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
+	test -f "$$out_dir/scripts/test-template-render.sh"; \
 	test -f "$$out_dir/template/README.md"; \
 	test -f "$$out_dir/template/.scaf/post-copy.py"; \
 	test -f "$$out_dir/template/justfile"; \
@@ -89,7 +95,7 @@ test-template-render-gitlab:
 	grep -Fq '{{ copier__project_name }}' "$$out_dir/template/README.md"; \
 	grep -Fq 'copier copy . /path/to/new-project --trust' "$$out_dir/README.md"; \
 	grep -Eq '^copier__project_name_raw:' "$$out_dir/copier.yml"; \
-	$(MAKE) -C "$$out_dir" test-template-render; \
+	(cd "$$out_dir" && bash ./scripts/test-template-render.sh); \
 	render_dir="$$(mktemp -d /tmp/scaf-template-rendered-gl-XXXXXX)"; \
 	copier copy "$$out_dir" "$$render_dir" --trust --defaults \
 	  -d copier__configure_repo=false \
