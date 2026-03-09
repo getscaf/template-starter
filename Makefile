@@ -28,6 +28,8 @@ test-template-render-github:
 	test -f "$$out_dir/README.md"; \
 	test -f "$$out_dir/LICENSE"; \
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
+	test ! -f "$$out_dir/.github/workflows/semantic-release.yaml"; \
+	test ! -f "$$out_dir/.github/workflows/semantic-pull-request.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/scripts/test-template-render.sh"; \
 	test -f "$$out_dir/template/README.md"; \
@@ -85,6 +87,8 @@ test-template-render-gitlab:
 	test -f "$$out_dir/README.md"; \
 	test -f "$$out_dir/LICENSE"; \
 	test -f "$$out_dir/.github/workflows/template-correctness.yaml"; \
+	test ! -f "$$out_dir/.github/workflows/semantic-release.yaml"; \
+	test ! -f "$$out_dir/.github/workflows/semantic-pull-request.yaml"; \
 	test -f "$$out_dir/.copier-answers.yml"; \
 	test -f "$$out_dir/scripts/test-template-render.sh"; \
 	test -f "$$out_dir/template/README.md"; \

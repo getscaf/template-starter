@@ -273,6 +273,10 @@ def prune_starter_template() -> None:
     if CI_PROVIDER != "gitlab":
         remove(TEMPLATE_ROOT / ".gitlab-ci.yml")
 
+    if CI_PROVIDER != "github" or not SEMANTIC_RELEASE:
+        remove(PROJECT_ROOT / ".github/workflows/semantic-release.yaml")
+        remove(PROJECT_ROOT / ".github/workflows/semantic-pull-request.yaml")
+
     if not SEMANTIC_RELEASE:
         remove(TEMPLATE_ROOT / "package.json")
         remove(TEMPLATE_ROOT / "dependencies-init.txt")

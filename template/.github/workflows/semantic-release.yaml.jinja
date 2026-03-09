@@ -1,0 +1,46 @@
+name: Semantic Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      {% if copier__github_semantic_release_auth == "github_app" %}
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: {% raw %}${{ secrets.SEMANTIC_RELEASE_APP_ID }}{% endraw %}
+          private-key: {% raw %}${{ secrets.SEMANTIC_RELEASE_APP_PRIVATE_KEY }}{% endraw %}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          token: {% raw %}${{ steps.app-token.outputs.token }}{% endraw %}
+      {% else %}
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      {% endif %}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.14.0"
+
+      - run: npm install
+
+      - run: npx semantic-release
+        env:
+          {% if copier__github_semantic_release_auth == "github_app" %}
+          GITHUB_TOKEN: {% raw %}${{ steps.app-token.outputs.token }}{% endraw %}
+          {% else %}
+          GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+          {% endif %}
