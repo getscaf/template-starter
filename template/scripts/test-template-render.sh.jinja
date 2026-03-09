@@ -19,6 +19,7 @@ copy_cmd=(
   -d "copier__email=sample@example.com"
   -d "copier__version=0.1.0"
   -d "copier__configure_repo=false"
+  -d "copier__create_repo=false"
   -d "copier__ci_provider=$copier_ci_provider"
   -d "copier__enable_semantic_release=$copier_enable_semantic_release"
   -d "copier__enable_secret_scanning=$copier_enable_secret_scanning"

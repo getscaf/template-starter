@@ -18,6 +18,7 @@ test-template-render-github:
 	  -d copier__ci_provider="github" \
 	  -d copier__enable_semantic_release=false \
 	  -d copier__github_semantic_release_auth="github_token" \
+	  -d copier__create_repo=false \
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="task"; \
 	test -f "$$out_dir/copier.yml"; \
@@ -74,6 +75,7 @@ test-template-render-gitlab:
 	  -d copier__version="0.1.0" \
 	  -d copier__ci_provider="gitlab" \
 	  -d copier__enable_semantic_release=false \
+	  -d copier__create_repo=false \
 	  -d copier__enable_secret_scanning=true \
 	  -d copier__task_runner="just"; \
 	test -f "$$out_dir/copier.yml"; \
