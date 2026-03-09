@@ -26,7 +26,7 @@ secret_scan:
 {% if copier__enable_semantic_release %}
 semantic_release:
   stage: release
-  image: node:22
+  image: node:lts
   script:
     - npm install
     - npx semantic-release
