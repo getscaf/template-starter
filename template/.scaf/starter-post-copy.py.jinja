@@ -194,9 +194,9 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
 
 
 def run_template_init() -> None:
-    if shutil.which("pre-commit") and try_run(["git", "rev-parse", "--is-inside-work-tree"], cwd=TEMPLATE_ROOT):
+    if shutil.which("pre-commit") and try_run(["git", "rev-parse", "--is-inside-work-tree"], cwd=PROJECT_ROOT):
         try:
-            run(["pre-commit", "install"], cwd=TEMPLATE_ROOT)
+            run(["pre-commit", "install"], cwd=PROJECT_ROOT)
         except subprocess.CalledProcessError:
             print("pre-commit install failed; continuing")
 
