@@ -280,6 +280,27 @@ def render_root_semantic_workflows() -> None:
     remove(workflow_templates)
 
 
+def render_root_semantic_assets() -> None:
+    semantic_assets = PROJECT_ROOT / ".scaf" / "semantic-assets"
+    asset_files = [
+        "package.json",
+        "dependencies-init.txt",
+        "dependencies-dev-init.txt",
+        ".releaserc.json",
+        "CHANGELOG.md",
+    ]
+
+    for asset_file in asset_files:
+        source = semantic_assets / asset_file
+        target = PROJECT_ROOT / asset_file
+        if SEMANTIC_RELEASE and source.exists():
+            shutil.copyfile(source, target)
+        else:
+            remove(target)
+
+    remove(semantic_assets)
+
+
 def prune_starter_template() -> None:
     render_root_task_runner()
     render_root_semantic_workflows()
@@ -353,6 +374,7 @@ def main() -> None:
     initialized_repo = init_git_repo()
     maybe_create_repo()
     configure_git_remote()
+    render_root_semantic_assets()
     run_template_init()
     prune_starter_template()
     remove(PROJECT_ROOT / ".scaf/starter-post-copy.py")
