@@ -159,9 +159,9 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
 
     if shutil.which("npm"):
         if init_packages:
-            run(["npm", "install", *init_packages], cwd=TEMPLATE_ROOT)
+            run(["npm", "install", *init_packages], cwd=PROJECT_ROOT)
         if dev_packages:
-            run(["npm", "install", "--save-dev", *dev_packages], cwd=TEMPLATE_ROOT)
+            run(["npm", "install", "--save-dev", *dev_packages], cwd=PROJECT_ROOT)
         return
 
     if shutil.which("docker"):
@@ -175,7 +175,7 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
                 "-w",
                 "/app",
                 "-v",
-                f"{TEMPLATE_ROOT}:/app",
+                f"{PROJECT_ROOT}:/app",
                 "-e",
                 "npm_config_cache=/tmp/.npm",
                 "node:lts",
@@ -186,7 +186,7 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
                     f"if [ -s {dev_file.name!r} ]; then xargs npm install --save-dev < {dev_file.name!r}; fi"
                 ),
             ],
-            cwd=TEMPLATE_ROOT,
+            cwd=PROJECT_ROOT,
         )
         return
 
@@ -201,12 +201,12 @@ def run_template_init() -> None:
             print("pre-commit install failed; continuing")
 
     if SEMANTIC_RELEASE:
-        init_deps = TEMPLATE_ROOT / "dependencies-init.txt"
-        dev_deps = TEMPLATE_ROOT / "dependencies-dev-init.txt"
+        init_deps = PROJECT_ROOT / "dependencies-init.txt"
+        dev_deps = PROJECT_ROOT / "dependencies-dev-init.txt"
 
         if has_unrendered_jinja(init_deps) or has_unrendered_jinja(dev_deps):
             with tempfile.NamedTemporaryFile(
-                mode="w", dir=TEMPLATE_ROOT, prefix=".scaf-deps-init.", delete=False
+                mode="w", dir=PROJECT_ROOT, prefix=".scaf-deps-init.", delete=False
             ) as init_tmp:
                 for line in read_packages(init_deps):
                     if ("{" + "{") in line or ("{" + "%") in line:
@@ -215,7 +215,7 @@ def run_template_init() -> None:
                 init_tmp_path = pathlib.Path(init_tmp.name)
 
             with tempfile.NamedTemporaryFile(
-                mode="w", dir=TEMPLATE_ROOT, prefix=".scaf-deps-dev.", delete=False
+                mode="w", dir=PROJECT_ROOT, prefix=".scaf-deps-dev.", delete=False
             ) as dev_tmp:
                 for line in read_packages(dev_deps):
                     if ("{" + "{") in line or ("{" + "%") in line:
@@ -297,6 +297,11 @@ def prune_starter_template() -> None:
         remove(TEMPLATE_ROOT / ".gitlab-ci.yml")
 
     if not SEMANTIC_RELEASE:
+        remove(PROJECT_ROOT / "package.json")
+        remove(PROJECT_ROOT / "dependencies-init.txt")
+        remove(PROJECT_ROOT / "dependencies-dev-init.txt")
+        remove(PROJECT_ROOT / ".releaserc.json")
+        remove(PROJECT_ROOT / "CHANGELOG.md")
         remove(TEMPLATE_ROOT / "package.json")
         remove(TEMPLATE_ROOT / "dependencies-init.txt")
         remove(TEMPLATE_ROOT / "dependencies-dev-init.txt")

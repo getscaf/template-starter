@@ -36,10 +36,8 @@ jobs:
           node-version: "lts/*"
 
       - run: npm install
-        working-directory: template
 
       - run: npx semantic-release
-        working-directory: template
         env:
           {% if copier__github_semantic_release_auth == "github_app" %}
           GITHUB_TOKEN: {% raw %}${{ steps.app-token.outputs.token }}{% endraw %}
