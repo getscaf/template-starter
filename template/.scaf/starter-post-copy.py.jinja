@@ -258,8 +258,31 @@ def render_root_task_runner() -> None:
     remove(runner_templates)
 
 
+def render_root_semantic_workflows() -> None:
+    workflow_templates = PROJECT_ROOT / ".scaf" / "workflows"
+    root_workflows = PROJECT_ROOT / ".github" / "workflows"
+    root_workflows.mkdir(parents=True, exist_ok=True)
+
+    workflow_files = [
+        "semantic-release.yaml",
+        "semantic-pull-request.yaml",
+    ]
+
+    for workflow_file in workflow_files:
+        source = workflow_templates / workflow_file
+        target = root_workflows / workflow_file
+
+        if CI_PROVIDER == "github" and SEMANTIC_RELEASE and source.exists():
+            shutil.copyfile(source, target)
+        else:
+            remove(target)
+
+    remove(workflow_templates)
+
+
 def prune_starter_template() -> None:
     render_root_task_runner()
+    render_root_semantic_workflows()
 
     if TASK_RUNNER != "make":
         remove(TEMPLATE_ROOT / "Makefile")
@@ -272,10 +295,6 @@ def prune_starter_template() -> None:
         remove(TEMPLATE_ROOT / ".github")
     if CI_PROVIDER != "gitlab":
         remove(TEMPLATE_ROOT / ".gitlab-ci.yml")
-
-    if CI_PROVIDER != "github" or not SEMANTIC_RELEASE:
-        remove(PROJECT_ROOT / ".github/workflows/semantic-release.yaml")
-        remove(PROJECT_ROOT / ".github/workflows/semantic-pull-request.yaml")
 
     if not SEMANTIC_RELEASE:
         remove(TEMPLATE_ROOT / "package.json")
