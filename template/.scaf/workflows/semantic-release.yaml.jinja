@@ -16,14 +16,14 @@ jobs:
       - uses: actions/create-github-app-token@v1
         id: app-token
         with:
-          app-id: ${{ '{{ secrets.SEMANTIC_RELEASE_APP_ID }}' }}
-          private-key: ${{ '{{ secrets.SEMANTIC_RELEASE_APP_PRIVATE_KEY }}' }}
+          app-id: {% raw %}${{ secrets.SEMANTIC_RELEASE_APP_ID }}{% endraw %}
+          private-key: {% raw %}${{ secrets.SEMANTIC_RELEASE_APP_PRIVATE_KEY }}{% endraw %}
 
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
-          token: ${{ '{{ steps.app-token.outputs.token }}' }}
+          token: {% raw %}${{ steps.app-token.outputs.token }}{% endraw %}
       {% else %}
       - uses: actions/checkout@v4
         with:
@@ -40,7 +40,7 @@ jobs:
       - run: npx semantic-release
         env:
           {% if copier__github_semantic_release_auth == "github_app" %}
-          GITHUB_TOKEN: ${{ '{{ steps.app-token.outputs.token }}' }}
+          GITHUB_TOKEN: {% raw %}${{ steps.app-token.outputs.token }}{% endraw %}
           {% else %}
-          GITHUB_TOKEN: ${{ '{{ secrets.GITHUB_TOKEN }}' }}
+          GITHUB_TOKEN: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
           {% endif %}

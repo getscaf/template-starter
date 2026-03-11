@@ -1,0 +1,7 @@
+version: "3"
+
+tasks:
+  test-template-render:
+    desc: Validate template rendering output
+    cmds:
+      - bash ./scripts/test-template-render.sh

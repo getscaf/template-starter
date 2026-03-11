@@ -159,9 +159,9 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
 
     if shutil.which("npm"):
         if init_packages:
-            run(["npm", "install", *init_packages], cwd=TEMPLATE_ROOT)
+            run(["npm", "install", *init_packages], cwd=PROJECT_ROOT)
         if dev_packages:
-            run(["npm", "install", "--save-dev", *dev_packages], cwd=TEMPLATE_ROOT)
+            run(["npm", "install", "--save-dev", *dev_packages], cwd=PROJECT_ROOT)
         return
 
     if shutil.which("docker"):
@@ -175,7 +175,7 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
                 "-w",
                 "/app",
                 "-v",
-                f"{TEMPLATE_ROOT}:/app",
+                f"{PROJECT_ROOT}:/app",
                 "-e",
                 "npm_config_cache=/tmp/.npm",
                 "node:lts",
@@ -186,7 +186,7 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
                     f"if [ -s {dev_file.name!r} ]; then xargs npm install --save-dev < {dev_file.name!r}; fi"
                 ),
             ],
-            cwd=TEMPLATE_ROOT,
+            cwd=PROJECT_ROOT,
         )
         return
 
@@ -194,19 +194,19 @@ def install_semantic_release_deps(init_file: pathlib.Path, dev_file: pathlib.Pat
 
 
 def run_template_init() -> None:
-    if shutil.which("pre-commit") and try_run(["git", "rev-parse", "--is-inside-work-tree"], cwd=TEMPLATE_ROOT):
+    if shutil.which("pre-commit") and try_run(["git", "rev-parse", "--is-inside-work-tree"], cwd=PROJECT_ROOT):
         try:
-            run(["pre-commit", "install"], cwd=TEMPLATE_ROOT)
+            run(["pre-commit", "install"], cwd=PROJECT_ROOT)
         except subprocess.CalledProcessError:
             print("pre-commit install failed; continuing")
 
     if SEMANTIC_RELEASE:
-        init_deps = TEMPLATE_ROOT / "dependencies-init.txt"
-        dev_deps = TEMPLATE_ROOT / "dependencies-dev-init.txt"
+        init_deps = PROJECT_ROOT / "dependencies-init.txt"
+        dev_deps = PROJECT_ROOT / "dependencies-dev-init.txt"
 
         if has_unrendered_jinja(init_deps) or has_unrendered_jinja(dev_deps):
             with tempfile.NamedTemporaryFile(
-                mode="w", dir=TEMPLATE_ROOT, prefix=".scaf-deps-init.", delete=False
+                mode="w", dir=PROJECT_ROOT, prefix=".scaf-deps-init.", delete=False
             ) as init_tmp:
                 for line in read_packages(init_deps):
                     if ("{" + "{") in line or ("{" + "%") in line:
@@ -215,7 +215,7 @@ def run_template_init() -> None:
                 init_tmp_path = pathlib.Path(init_tmp.name)
 
             with tempfile.NamedTemporaryFile(
-                mode="w", dir=TEMPLATE_ROOT, prefix=".scaf-deps-dev.", delete=False
+                mode="w", dir=PROJECT_ROOT, prefix=".scaf-deps-dev.", delete=False
             ) as dev_tmp:
                 for line in read_packages(dev_deps):
                     if ("{" + "{") in line or ("{" + "%") in line:
@@ -238,7 +238,73 @@ def run_template_init() -> None:
     print("Local development setup complete.")
 
 
+def render_root_task_runner() -> None:
+    runner_templates = PROJECT_ROOT / ".scaf" / "task-runners"
+    by_runner = {
+        "make": "Makefile",
+        "task": "Taskfile.yml",
+        "just": "justfile",
+    }
+    selected = by_runner.get(TASK_RUNNER)
+
+    for runner_file in by_runner.values():
+        target = PROJECT_ROOT / runner_file
+        source = runner_templates / runner_file
+        if runner_file == selected and source.exists():
+            shutil.copyfile(source, target)
+        else:
+            remove(target)
+
+    remove(runner_templates)
+
+
+def render_root_semantic_workflows() -> None:
+    workflow_templates = PROJECT_ROOT / ".scaf" / "workflows"
+    root_workflows = PROJECT_ROOT / ".github" / "workflows"
+    root_workflows.mkdir(parents=True, exist_ok=True)
+
+    workflow_files = [
+        "semantic-release.yaml",
+        "semantic-pull-request.yaml",
+    ]
+
+    for workflow_file in workflow_files:
+        source = workflow_templates / workflow_file
+        target = root_workflows / workflow_file
+
+        if CI_PROVIDER == "github" and SEMANTIC_RELEASE and source.exists():
+            shutil.copyfile(source, target)
+        else:
+            remove(target)
+
+    remove(workflow_templates)
+
+
+def render_root_semantic_assets() -> None:
+    semantic_assets = PROJECT_ROOT / ".scaf" / "semantic-assets"
+    asset_files = [
+        "package.json",
+        "dependencies-init.txt",
+        "dependencies-dev-init.txt",
+        ".releaserc.json",
+        "CHANGELOG.md",
+    ]
+
+    for asset_file in asset_files:
+        source = semantic_assets / asset_file
+        target = PROJECT_ROOT / asset_file
+        if SEMANTIC_RELEASE and source.exists():
+            shutil.copyfile(source, target)
+        else:
+            remove(target)
+
+    remove(semantic_assets)
+
+
 def prune_starter_template() -> None:
+    render_root_task_runner()
+    render_root_semantic_workflows()
+
     if TASK_RUNNER != "make":
         remove(TEMPLATE_ROOT / "Makefile")
     if TASK_RUNNER != "task":
@@ -252,6 +318,11 @@ def prune_starter_template() -> None:
         remove(TEMPLATE_ROOT / ".gitlab-ci.yml")
 
     if not SEMANTIC_RELEASE:
+        remove(PROJECT_ROOT / "package.json")
+        remove(PROJECT_ROOT / "dependencies-init.txt")
+        remove(PROJECT_ROOT / "dependencies-dev-init.txt")
+        remove(PROJECT_ROOT / ".releaserc.json")
+        remove(PROJECT_ROOT / "CHANGELOG.md")
         remove(TEMPLATE_ROOT / "package.json")
         remove(TEMPLATE_ROOT / "dependencies-init.txt")
         remove(TEMPLATE_ROOT / "dependencies-dev-init.txt")
@@ -303,6 +374,7 @@ def main() -> None:
     initialized_repo = init_git_repo()
     maybe_create_repo()
     configure_git_remote()
+    render_root_semantic_assets()
     run_template_init()
     prune_starter_template()
     remove(PROJECT_ROOT / ".scaf/starter-post-copy.py")

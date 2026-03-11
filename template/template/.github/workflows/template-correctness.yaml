@@ -18,6 +18,11 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
       - name: Install copier
         run: pip install copier
 
@@ -30,6 +35,8 @@ jobs:
             -d copier__author_name="Sample Author" \
             -d copier__email="sample@example.com" \
             -d copier__version="0.1.0" \
+            -d copier__configure_repo=false \
+            -d copier__create_repo=false \
             -d copier__ci_provider="{{ copier__ci_provider }}" \
             -d copier__enable_semantic_release={{ 'true' if copier__enable_semantic_release else 'false' }} \
             -d copier__github_semantic_release_auth="{{ copier__github_semantic_release_auth }}" \

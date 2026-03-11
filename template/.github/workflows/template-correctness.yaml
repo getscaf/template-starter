@@ -18,28 +18,13 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
       - name: Install copier
         run: pip install copier
 
-      - name: Render sample project
-        run: |
-          copier copy . /tmp/sample-project --trust --defaults \
-            -d copier__project_name_raw="Sample Project" \
-            -d copier__project_slug="sample_project" \
-            -d copier__description="Sample generated project" \
-            -d copier__author_name="Sample Author" \
-            -d copier__email="sample@example.com" \
-            -d copier__version="0.1.0" \
-            -d copier__configure_repo=false \
-            -d copier__ci_provider="github" \
-            -d copier__enable_semantic_release=false \
-            -d copier__enable_secret_scanning=false \
-            -d copier__task_runner="task"
-
-      - name: Validate generated project files
-        run: |
-          test -f /tmp/sample-project/README.md
-          test -f /tmp/sample-project/.copier-answers.yml
-          test -f /tmp/sample-project/Taskfile.yml
-          test ! -f /tmp/sample-project/Makefile
-          test ! -f /tmp/sample-project/justfile
+      - name: Run render tests
+        run: bash ./scripts/test-template-render.sh
