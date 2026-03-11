@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0](https://github.com/getscaf/template-starter/compare/v1.1.2...v1.2.0) (2026-03-11)
+
+### Features
+
+* template bootstrap enhancements ([#5](https://github.com/getscaf/template-starter/issues/5)) ([c1a1f0f](https://github.com/getscaf/template-starter/commit/c1a1f0f8d37b53ad4d802ed29991d484a661704e))
+
 ## [1.1.2](https://github.com/getscaf/template-starter/compare/v1.1.1...v1.1.2) (2026-03-07)
 
 ### Bug Fixes
